@@ -261,5 +261,17 @@ public class Game {
         }
 
 
+        public void placeBoatSequence(int seq){
+
+            switch(seq){
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+            }
+        }
+
 
 }
