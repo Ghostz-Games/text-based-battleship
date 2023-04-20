@@ -13,6 +13,11 @@ public class Game {
     public boolean didPlace1 = false;
     public boolean didPlace2 = false;
     public boolean didPlace3 = false;
+    public int prevHitx = -1;
+    public int prevHitY = -1;
+
+    public int playerHP = 9;
+    public int enemyHP = 9;
 
     public enum TURN{
         PLAYER,
@@ -57,34 +62,56 @@ public class Game {
     }
 
     private void turnChecker(TURN currentTurn) {
-        switch(currentTurn){
-            case PLAYER:
-                displayBoard(3);
-                UI.message("--------------------------------------------------------------------------------------------------");
-                UI.message("PLAYER TURN!");
-                int atkX = Integer.parseInt(UI.userInput("Enter the X coordinate for the shot"));
-                int atkY = Integer.parseInt(UI.userInput("Enter the Y coordinate for the shot"));
-                playerAttack(atkX, atkY);
-                break;
-            case CPU:
-                UI.message("ENEMY TURN");
-                int cpuX = random.nextInt(0,14);
-                int cpuY = random.nextInt(0,14);
-                cpuAttack(cpuX, cpuY);
-                break;
+        if(playerHP > 0 && enemyHP > 0) {
+            switch (currentTurn) {
+                case PLAYER:
+                    displayBoard(3);
+                    UI.message("--------------------------------------------------------------------------------------------------");
+                    UI.message("PLAYER TURN!");
+                    int atkX = Integer.parseInt(UI.userInput("Enter the X coordinate for the shot"));
+                    int atkY = Integer.parseInt(UI.userInput("Enter the Y coordinate for the shot"));
+                    playerAttack(atkX, atkY);
+                    break;
+                case CPU:
+                    UI.message("ENEMY TURN");
+                    if (prevHitx < 0 && prevHitY < 0) {
+                        int cpuX = random.nextInt(0, 14);
+                        int cpuY = random.nextInt(0, 14);
+                        cpuAttack(cpuX, cpuY);
+                    } else {
+                        int cpuX = prevHitx + random.nextInt(-2, 2);
+                        int cpuY = prevHitY + random.nextInt(-2, 2);
+                        cpuAttack(cpuX, cpuY);
+                    }
+                    break;
+            }
+        }else if((playerHP == 0) || (enemyHP == 0)){
+            if(playerHP > enemyHP){
+                UI.message("GAME ENDED! PLAYER WIN!");
+            }else if(enemyHP > playerHP){
+                UI.message("GAME ENDED! CPU WINS!");
+            }
         }
     }
 
     private void cpuAttack(int cpuX, int cpuY) {
+
         if(board[cpuX][cpuY] instanceof Boat){
+            prevHitx = cpuX;
+            prevHitY = cpuY;
             UI.message("The CPU hit one of your boats!");
+            playerHP -= 1;
             board[cpuX][cpuY] = new DestroyedSpot();
             displayBoard(1);
             UI.message("--------------------------------------------------------------------------------------------------");
             UI.message("The cpu gets another turn!");
             turnChecker(TURN.CPU);
-        }else{
+        }else if(board[cpuX][cpuY] instanceof MissedSpot){
+            turnChecker(TURN.CPU);
+        }else {
             UI.message("The cpu missed!");
+            prevHitx = -1;
+            prevHitY = -1;
             board[cpuX][cpuY] = new MissedSpot();
             displayBoard(1);
             UI.message("--------------------------------------------------------------------------------------------------");
@@ -95,6 +122,7 @@ public class Game {
     private void playerAttack(int atkX, int atkY) {
         if(CPUboard[atkX][atkY] instanceof CPUBoat){
             UI.message("You hit a boat!");
+            enemyHP -= 1;
             gameBoard[atkX][atkY] = new DestroyedSpot();
             displayBoard(3);
             UI.message("--------------------------------------------------------------------------------------------------");
