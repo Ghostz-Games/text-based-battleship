@@ -56,8 +56,9 @@ public class Game {
         displayBoard(1);
         displayBoard(2);
 
-        turnChecker(currentTurn);
-
+        while(playerHP > 0 || enemyHP > 0) {
+            turnChecker(currentTurn);
+        }
 
     }
 
@@ -79,9 +80,15 @@ public class Game {
                         int cpuY = random.nextInt(0, 14);
                         cpuAttack(cpuX, cpuY);
                     } else {
-                        int cpuX = prevHitx + random.nextInt(-2, 2);
-                        int cpuY = prevHitY + random.nextInt(-2, 2);
-                        cpuAttack(cpuX, cpuY);
+                        if((prevHitx + 1) < 13 && (prevHitx -1) > 0 && (prevHitY + 1) < 13 && (prevHitY - 1) > 0) {
+                            int cpuX = prevHitx + random.nextInt(-1, 1);
+                            int cpuY = prevHitY + random.nextInt(-1, 1);
+                            cpuAttack(cpuX, cpuY);
+                        }else {
+                            int cpuX = random.nextInt(0,14);
+                            int cpuY = random.nextInt(0,14);
+                            cpuAttack(cpuX, cpuY);
+                        }
                     }
                     break;
             }
